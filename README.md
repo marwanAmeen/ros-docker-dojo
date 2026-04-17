@@ -3,7 +3,7 @@
 ## File layout
 
 ```
-ros1/
+ros-docker-dojo/
 ├── docker-compose.yml   # three services: roscore, ros-base, ros-desktop
 ├── entrypoint.sh        # sources ROS + workspace on startup
 └── ws/                  # your catkin workspace (create manually first)
