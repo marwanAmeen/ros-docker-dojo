@@ -1,0 +1,95 @@
+services:
+  # ─────────────────────────────────────────────────────────────
+  # roscore  →  ros:noetic-ros-core
+  #   Runs the ROS master (roscore) that all other nodes
+  #   must connect to.  Keep this running the whole session.
+  # ─────────────────────────────────────────────────────────────
+  roscore:
+    image: ros:noetic-ros-core
+    container_name: ros1_roscore
+    hostname: roscore
+
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=roscore
+
+    networks:
+      - ros1_net
+
+    command: roscore
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────────────────────
+  # ros-base  →  ros:noetic-ros-base
+  #   CLI tools, rospy, roscpp, std_msgs, catkin.
+  #   Use this terminal for: catkin_make, rosrun, rostopic,
+  #   rosnode, writing publishers & subscribers.
+  # ─────────────────────────────────────────────────────────────
+  ros-base:
+    image: ros:noetic-ros-base
+    container_name: ros1_base
+    hostname: ros-base
+    depends_on:
+      - roscore
+
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=ros-base
+      - DISPLAY=${DISPLAY:-host.docker.internal:0.0}
+
+    volumes:
+      - ./ws:/ros1_ws
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+    networks:
+      - ros1_net
+
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    command: bash
+
+  # ─────────────────────────────────────────────────────────────
+  # ros-desktop  →  osrf/ros:noetic-desktop-full
+  #   Adds: turtlesim, rqt tools, rviz.
+  #   Use this terminal for: rosrun turtlesim turtlesim_node,
+  #   rostopic echo/pub/info, rosnode list/info/ping.
+  #   rqt_graph is available here too if you change your mind.
+  # ─────────────────────────────────────────────────────────────
+  ros-desktop:
+    image: osrf/ros:noetic-desktop-full
+    container_name: ros1_desktop
+    hostname: ros-desktop
+    depends_on:
+      - roscore
+
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=ros-desktop
+      - DISPLAY=${DISPLAY:-host.docker.internal:0.0}
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - QT_X11_NO_MITSHM=1
+      - PULSE_SERVER=unix:/mnt/wslg/PulseServer   # WSLg PulseAudio socket
+
+    volumes:
+      - ./ws:/ros1_ws
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /mnt/wslg:/mnt/wslg                        # WSLg audio + display
+
+    networks:
+      - ros1_net
+
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    command: bash
+
+networks:
+  ros1_net:
+    driver: bridge

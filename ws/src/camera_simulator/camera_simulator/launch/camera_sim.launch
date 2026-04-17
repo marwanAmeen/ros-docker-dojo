@@ -1,0 +1,27 @@
+<launch>
+
+    <!-- ── Camera Simulator ──────────────────────────────────────────────────
+         Reads a video file and publishes frames to /usb_cam/image_raw.
+         Change the 'video' param to your video file path, e.g:
+             video="/ros1_ws/src/camera_simulator/videos/test.mp4"
+         Or leave as 0 to try the first webcam device.
+    ─────────────────────────────────────────────────────────────────────── -->
+    <node name="camera_simulator"
+          pkg="camera_simulator"
+          type="camera_simulator.py"
+          output="screen">
+        <param name="video" value="/ros1_ws/src/camera_simulator/camera_simulator/videos/test.mp4" />       <!-- 0 = webcam, or a file path -->
+        <param name="fps"   value="15" />
+        <param name="topic" value="/usb_cam/image_raw" />
+    </node>
+
+    <!-- ── Face Detection ───────────────────────────────────────────────────
+         opencv_apps face_detection subscribes to /usb_cam/image_raw
+         and publishes detected faces to /face_detection/faces
+    ─────────────────────────────────────────────────────────────────────── -->
+    <include file="$(find opencv_apps)/launch/face_detection.launch">
+        <arg name="image" value="/usb_cam/image_raw" />
+        <arg name="use_camera_info" value="false" />
+    </include>
+
+</launch>

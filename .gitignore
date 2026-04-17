@@ -1,0 +1,31 @@
+# ── Catkin build artifacts ────────────────────────────────────
+ws/build/
+ws/devel/
+ws/.catkin_workspace
+
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── ROS logs ──────────────────────────────────────────────────
+*.log
+.ros/
+log/
+
+# ── OS files ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── VS Code ───────────────────────────────────────────────────
+.vscode/
+
+# ── Videos (too large for git) ────────────────────────────────
+ws/src/camera_simulator/camera_simulator/videos/*.mp4
+ws/src/camera_simulator/camera_simulator/videos/*.avi
+ws/src/camera_simulator/camera_simulator/videos/*.mkv
+
+*CMakeLists.txt 
